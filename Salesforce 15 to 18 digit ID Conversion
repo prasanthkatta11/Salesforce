@@ -1,0 +1,27 @@
+If the XL Connector is prompting for an upgrade to Enterprise for ID conversion, please enable macros, click Visual Basic, insert a new module, and paste the following code:
+ 
+Function FixID(InID As String) As String
+    If Len(InID) = 18 Then
+        FixID = InID
+        Exit Function
+    End If
+    Dim InChars As String, InI As Integer, InUpper As String
+    Dim InCnt As Integer
+    InChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ012345"
+    InUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ 
+    InCnt = 0
+    For InI = 15 To 1 Step -1
+        InCnt = 2 * InCnt + Sgn(InStr(1, InUpper, Mid(InID, InI, 1), vbBinaryCompare))
+        If InI Mod 5 = 1 Then
+            FixID = Mid(InChars, InCnt + 1, 1) + FixID
+            InCnt = 0
+        End If
+    Next InI
+    FixID = InID + FixID
+End Function
+
+ 
+Then, you can use this function in your worksheet like any other formula. For example, if you have a 15-digit Salesforce ID in cell A2, simply use:
+ 
+=FixID(A2)
